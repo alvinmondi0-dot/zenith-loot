@@ -4,14 +4,14 @@ export const sendOrderConfirmationEmail = async (email: string, order: Order): P
   // In a real application, this would make an API call to a backend service 
   // (e.g., SendGrid, AWS SES) to send the email.
   
-  console.group(`📧 [Zenith Loot] Sending Order Confirmation`);
+  console.group(`📧 [Prime Loot] Sending Order Confirmation`);
   console.log(`To: ${email}`);
   console.log(`Subject: Order Confirmation #${order.id}`);
   console.log(`Date: ${order.date}`);
   console.log('--------------------------------------------------');
   console.log(`Hi ${order.userName},`);
   console.log(``);
-  console.log(`Thank you for your purchase at Zenith Loot!`);
+  console.log(`Thank you for your purchase at Prime Loot!`);
   console.log(``);
   console.log(`Order Details:`);
   console.log(`Game: ${order.gameName}`);
@@ -21,7 +21,7 @@ export const sendOrderConfirmationEmail = async (email: string, order: Order): P
   console.log(`Transaction ID: ${order.id}`);
   console.log(``);
   console.log(`Your top-up has been processed and delivered.`);
-  console.log(`Need help? Contact support@zenithloot.com`);
+  console.log(`Need help? Contact support@primeloot.com`);
   console.log('--------------------------------------------------');
   console.groupEnd();
   

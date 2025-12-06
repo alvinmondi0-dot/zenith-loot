@@ -2,7 +2,7 @@
 import React from 'react';
 import { Game } from '../types';
 import { PACKAGES } from '../constants';
-import { Heart, Zap, RefreshCw, Star } from 'lucide-react';
+import { Heart, Zap, RefreshCw, Star, Lock } from 'lucide-react';
 import { getSportsSeasonYear, formatPrice, convertPrice } from '../utils';
 
 interface GameCardProps {
@@ -19,6 +19,9 @@ const GameCard: React.FC<GameCardProps> = ({ game, isWishlisted, onToggleWishlis
   // Check if game is the updated version (contains current sports year)
   const seasonYear = getSportsSeasonYear().toString();
   const isUpdatedSeason = game.name.includes(seasonYear);
+  
+  // Classify Vouchers as Coming Soon
+  const isComingSoon = game.category === 'Voucher';
 
   // Calculate "Starts From" price for display
   const availablePackages = game.packages || PACKAGES;
@@ -28,25 +31,42 @@ const GameCard: React.FC<GameCardProps> = ({ game, isWishlisted, onToggleWishlis
 
   return (
     <div 
-      onClick={() => onClick(game)}
-      className="group relative rounded-2xl overflow-hidden cursor-pointer bg-slate-800 border border-slate-700 transition-all duration-500 ease-out transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-cyan-500/25 hover:border-cyan-400/50"
+      onClick={isComingSoon ? undefined : () => onClick(game)}
+      className={`group relative rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 transition-all duration-500 ease-out 
+        ${isComingSoon 
+          ? 'opacity-90 cursor-not-allowed' 
+          : 'cursor-pointer transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-cyan-500/25 hover:border-cyan-400/50'
+        }`}
     >
       <div className="aspect-[3/4] overflow-hidden relative">
         {/* Image with cinematic zoom */}
         <img 
           src={game.image} 
           alt={game.name} 
-          className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110 opacity-90 group-hover:opacity-100" 
+          className={`w-full h-full object-cover transition-transform duration-700 ease-in-out 
+            ${isComingSoon ? 'grayscale-[0.6] scale-100' : 'group-hover:scale-110 opacity-90 group-hover:opacity-100'}`} 
         />
         
-        {/* Dynamic Color Glow Overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-t ${game.primaryColor} opacity-0 group-hover:opacity-40 transition-opacity duration-500 mix-blend-overlay`} />
+        {/* Dynamic Color Glow Overlay (Only for active games) */}
+        {!isComingSoon && (
+          <div className={`absolute inset-0 bg-gradient-to-t ${game.primaryColor} opacity-0 group-hover:opacity-40 transition-opacity duration-500 mix-blend-overlay`} />
+        )}
         
         {/* Text Protection Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent opacity-90" />
         
-        {/* Badge: New Season Update */}
-        {isUpdatedSeason && (
+        {/* Coming Soon Overlay */}
+        {isComingSoon && (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] z-30 pointer-events-none">
+             <div className="px-5 py-2.5 bg-slate-900/90 border border-slate-500 rounded-xl flex items-center gap-2 transform -rotate-6 shadow-2xl">
+                <Lock className="w-5 h-5 text-slate-300" />
+                <span className="text-lg font-black text-white tracking-widest uppercase">Coming Soon</span>
+             </div>
+          </div>
+        )}
+
+        {/* Badge: New Season Update (Only active games) */}
+        {isUpdatedSeason && !isComingSoon && (
           <div className="absolute top-3 left-3 z-20 flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-[10px] font-extrabold px-2 py-1 rounded-md shadow-lg border border-white/20">
              <RefreshCw className="w-3 h-3 animate-spin-slow" />
              <span>NEW SEASON</span>
@@ -56,13 +76,13 @@ const GameCard: React.FC<GameCardProps> = ({ game, isWishlisted, onToggleWishlis
         {/* Wishlist Button */}
         <button 
           onClick={(e) => onToggleWishlist(e, game)}
-          className="absolute top-3 right-3 p-2.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-rose-500 hover:text-white transition-all z-20 border border-white/10 hover:border-rose-500"
+          className="absolute top-3 right-3 p-2.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-rose-500 hover:text-white transition-all z-40 border border-white/10 hover:border-rose-500"
         >
           <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-white'}`} />
         </button>
 
         {/* Content */}
-        <div className="absolute bottom-0 left-0 p-5 w-full transform transition-transform duration-300 group-hover:-translate-y-1">
+        <div className="absolute bottom-0 left-0 p-5 w-full transform transition-transform duration-300 group-hover:-translate-y-1 z-30">
           <div className="flex justify-between items-end mb-1">
              <p className="text-xs font-bold text-cyan-400 uppercase tracking-wider opacity-80 group-hover:opacity-100 flex items-center gap-1">
                {game.developer}
@@ -79,19 +99,27 @@ const GameCard: React.FC<GameCardProps> = ({ game, isWishlisted, onToggleWishlis
             {game.name}
           </h3>
 
-          {/* Price Badge */}
-          <div className="inline-block px-2 py-1 bg-slate-800/80 backdrop-blur border border-slate-600 rounded mb-3 text-[10px] text-slate-300">
-             Starts at <span className="text-white font-bold">{displayPrice}</span>
-          </div>
+          {/* Price Badge (Hidden if Coming Soon) */}
+          {!isComingSoon && (
+            <div className="inline-block px-2 py-1 bg-slate-800/80 backdrop-blur border border-slate-600 rounded mb-3 text-[10px] text-slate-300">
+               Starts at <span className="text-white font-bold">{displayPrice}</span>
+            </div>
+          )}
 
-          {/* Buy Now Button - Visible on hover or always visible for better UX */}
-          <button
-            onClick={(e) => onBuyNow(e, game)}
-            className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-95 border border-cyan-400/30"
-          >
-            <Zap className="w-4 h-4 fill-white" />
-            Buy Now
-          </button>
+          {/* Action Button */}
+          {isComingSoon ? (
+            <div className="w-full py-2.5 bg-slate-700/50 text-slate-400 text-sm font-bold rounded-lg border border-slate-600 flex items-center justify-center gap-2 cursor-not-allowed">
+               <Lock className="w-4 h-4" /> Not Available
+            </div>
+          ) : (
+            <button
+              onClick={(e) => onBuyNow(e, game)}
+              className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-95 border border-cyan-400/30"
+            >
+              <Zap className="w-4 h-4 fill-white" />
+              Buy Now
+            </button>
+          )}
         </div>
       </div>
     </div>

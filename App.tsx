@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -51,8 +50,8 @@ const App: React.FC = () => {
     const detected = detectUserCurrency();
     setCurrency(detected);
 
-    // Check for "Remember Me" session
-    const storedUser = localStorage.getItem('zenith_user');
+    // Check for "Remember Me" session with new key
+    const storedUser = localStorage.getItem('prime_loot_user');
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
@@ -61,7 +60,7 @@ const App: React.FC = () => {
         }
       } catch (e) {
         console.error("Failed to restore session", e);
-        localStorage.removeItem('zenith_user');
+        localStorage.removeItem('prime_loot_user');
       }
     }
   }, []);
@@ -235,7 +234,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     // Clear session storage
-    localStorage.removeItem('zenith_user');
+    localStorage.removeItem('prime_loot_user');
     
     setUser(null);
     setIsProfileOpen(false);
@@ -393,7 +392,7 @@ const App: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1 md:col-span-1">
               <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                ZENITH LOOT
+                PRIME LOOT
               </span>
               <p className="mt-4 text-slate-400 text-sm">
                 Your trusted partner for digital game currency. Powering gamers globally with instant delivery and secure payments.
@@ -432,7 +431,7 @@ const App: React.FC = () => {
           
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-500 text-sm text-center md:text-left">
-              © {new Date().getFullYear()} Zenith Loot. All rights reserved. <span className="text-slate-700 ml-2">v1.0.0 (Live)</span>
+              © {new Date().getFullYear()} Prime Loot. All rights reserved. <span className="text-slate-700 ml-2">v1.0.0 (Live)</span>
             </p>
             <div className="flex gap-4">
                {/* Payment Icons Mock */}

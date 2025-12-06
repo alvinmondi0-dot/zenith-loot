@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { X, DollarSign, TrendingUp, Users, CreditCard, ArrowUpRight, Download, Building, Wallet, CheckCircle, AlertCircle, Clock, MapPin, User, Activity } from 'lucide-react';
 import { Order } from '../types';

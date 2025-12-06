@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { ShoppingCart, Menu, Search, Gamepad2, User, LogIn, Globe, LayoutDashboard, ChevronDown, X, Package, Heart, CreditCard } from 'lucide-react';
 import { User as UserType } from '../types';
@@ -47,10 +45,10 @@ const Navbar: React.FC<NavbarProps> = ({
               <Gamepad2 className="text-white w-5 h-5" />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 hidden sm:block">
-              ZENITH LOOT
+              PRIME LOOT
             </span>
              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 sm:hidden">
-              ZENITH
+              PRIME
             </span>
           </div>
 

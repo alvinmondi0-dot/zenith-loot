@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { X, Package as PackageIcon, Heart, User, LogOut, Clock, CheckCircle, Gamepad2, CreditCard, Smartphone, Wallet } from 'lucide-react';
 import { User as UserType, Order, Game } from '../types';
@@ -22,7 +23,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     switch(method) {
       case 'paypal': return <Wallet className="w-3.5 h-3.5 text-blue-400" />;
       case 'mpesa': return <Smartphone className="w-3.5 h-3.5 text-green-500" />;
-      case 'airtel_money': return <Smartphone className="w-3.5 h-3.5 text-red-500" />;
       case 'google_pay': return <Wallet className="w-3.5 h-3.5 text-white" />;
       case 'apple_pay': return <Wallet className="w-3.5 h-3.5 text-white" />;
       default: return <CreditCard className="w-3.5 h-3.5 text-purple-400" />;

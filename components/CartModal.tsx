@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { X, Trash2, CreditCard, ShoppingBag, ArrowRight, Wallet, Smartphone, CheckCircle, Mail, AlertCircle } from 'lucide-react';
 import { CartItem, User, PaymentMethod } from '../types';
@@ -173,7 +174,8 @@ const CartModal: React.FC<CartModalProps> = ({ items, onClose, onRemove, onCheck
                     {renderPaymentMethod('credit_card', 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg', 'Credit Card')}
                     {renderPaymentMethod('paypal', 'https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg', 'PayPal')}
                     {renderPaymentMethod('mpesa', 'https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg', 'M-Pesa')}
-                    {renderPaymentMethod('airtel_money', 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Airtel_logo_2010.svg', 'Airtel Money')}
+                    {renderPaymentMethod('google_pay', 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg', 'Google Pay')}
+                    {renderPaymentMethod('apple_pay', 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg', 'Apple Pay')}
                   </div>
                </div>
             </div>

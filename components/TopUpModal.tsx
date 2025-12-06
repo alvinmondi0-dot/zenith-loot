@@ -145,7 +145,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
     if (!selectedPackage) return;
     
     // Check mobile validation
-    if (['mpesa', 'airtel_money'].includes(selectedPaymentMethod)) {
+    if (selectedPaymentMethod === 'mpesa') {
       if (!validatePhoneNumber(phoneNumber)) {
         setPhoneError('Please enter a valid phone number to proceed.');
         return;
@@ -218,7 +218,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
     } 
     if (step === 2 && !selectedPackageId) return true;
     if (isProcessing) return true;
-    if (step === 3 && ['mpesa', 'airtel_money'].includes(selectedPaymentMethod) && (!phoneNumber || !!phoneError)) return true;
+    if (step === 3 && selectedPaymentMethod === 'mpesa' && (!phoneNumber || !!phoneError)) return true;
     return false;
   };
 
@@ -509,7 +509,6 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
                         {renderPaymentMethod('mpesa', 'https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg', 'M-Pesa')}
                         {renderPaymentMethod('google_pay', 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg', 'Google Pay')}
                         {renderPaymentMethod('apple_pay', 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg', 'Apple Pay')}
-                        {renderPaymentMethod('airtel_money', 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Airtel_logo_2010.svg', 'Airtel')}
                       </div>
                       
                       {/* Selected Method Confirmation Banner */}
@@ -525,17 +524,17 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
                    </div>
                    
                    {/* Mobile Money Inputs */}
-                   {['mpesa', 'airtel_money'].includes(selectedPaymentMethod) && (
+                   {selectedPaymentMethod === 'mpesa' && (
                      <div className="animate-in slide-in-from-top-2 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
                         <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">
-                          {selectedPaymentMethod === 'mpesa' ? "M-Pesa Number" : "Airtel Money Number"}
+                          M-Pesa Number
                         </label>
                         <div className="relative">
                           <input 
                             type="tel" 
                             value={phoneNumber}
                             onChange={handlePhoneChange}
-                            placeholder={selectedPaymentMethod === 'mpesa' ? "07XX XXX XXX" : "07XX XXX XXX"}
+                            placeholder="07XX XXX XXX"
                             className={`w-full bg-slate-900 border ${phoneError ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-700 focus:ring-cyan-500'} rounded-xl px-4 py-3 text-white text-lg tracking-wide focus:ring-2 focus:outline-none transition-all font-mono`}
                           />
                           {!phoneError && phoneNumber.length >= 10 && (

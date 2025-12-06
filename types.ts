@@ -71,4 +71,4 @@ export interface Review {
   date: string;
 }
 
-export type PaymentMethod = 'credit_card' | 'paypal' | 'mpesa' | 'google_pay' | 'apple_pay' | 'airtel_money';
+export type PaymentMethod = 'credit_card' | 'paypal' | 'mpesa' | 'google_pay' | 'apple_pay';

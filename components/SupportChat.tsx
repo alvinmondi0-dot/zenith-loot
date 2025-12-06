@@ -10,7 +10,7 @@ const SupportChat: React.FC = () => {
     {
       id: 'welcome',
       role: 'model',
-      text: 'Hi! I\'m ZenithBot. How can I assist you with your purchase today?',
+      text: 'Hi! I\'m PrimeBot. How can I assist you with your purchase today?',
       timestamp: new Date()
     }
   ]);
@@ -71,7 +71,7 @@ const SupportChat: React.FC = () => {
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-white font-bold text-sm">Zenith Support</h3>
+                <h3 className="text-white font-bold text-sm">Prime Support</h3>
                 <p className="text-xs text-green-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                   Online

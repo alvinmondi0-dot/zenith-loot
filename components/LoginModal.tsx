@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Mail, Lock, User, ArrowRight, Github, Check } from 'lucide-react';
 import { User as UserType } from '../types';
@@ -34,7 +33,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
     // Handle Remember Me
     if (rememberMe) {
-      localStorage.setItem('zenith_user', JSON.stringify(user));
+      localStorage.setItem('prime_loot_user', JSON.stringify(user));
     }
 
     onLogin(user);
@@ -55,7 +54,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-white mb-2">
-            {isRegistering ? 'Join Zenith Loot' : 'Welcome Back'}
+            {isRegistering ? 'Join Prime Loot' : 'Welcome Back'}
           </h2>
           <p className="text-slate-400 text-sm">
             {isRegistering ? 'Create an account to track orders & earn rewards.' : 'Sign in to access your account and wishlist.'}
