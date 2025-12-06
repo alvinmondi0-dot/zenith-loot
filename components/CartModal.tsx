@@ -1,7 +1,6 @@
 
-
 import React, { useState } from 'react';
-import { X, Trash2, CreditCard, ShoppingBag, ArrowRight, Wallet, Smartphone, CheckCircle, Mail, AlertCircle } from 'lucide-react';
+import { X, Trash2, CreditCard, ShoppingBag, ArrowRight, CheckCircle, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { CartItem, User, PaymentMethod } from '../types';
 import { formatPrice, convertPrice } from '../utils';
 
@@ -44,7 +43,7 @@ const CartModal: React.FC<CartModalProps> = ({ items, onClose, onRemove, onCheck
     
     // Simulate processing
     setTimeout(() => {
-      onCheckout(selectedMethod, user?.email || email, 0); // 0 discount for now, promo logic could be added here
+      onCheckout(selectedMethod, user?.email || email, 0); // 0 discount for now
       setIsProcessing(false);
     }, 1500);
   };
@@ -214,7 +213,11 @@ const CartModal: React.FC<CartModalProps> = ({ items, onClose, onRemove, onCheck
                    disabled={isProcessing}
                    className="flex-1 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 disabled:opacity-50"
                  >
-                   {isProcessing ? 'Processing...' : 'Complete Payment'}
+                   {isProcessing ? (
+                     <>
+                       <Loader2 className="w-5 h-5 animate-spin" /> Processing
+                     </>
+                   ) : 'Complete Payment'}
                  </button>
                </div>
              )}
