@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { X, DollarSign, TrendingUp, Users, CreditCard, ArrowUpRight, Download, Building, Wallet, CheckCircle, AlertCircle, Clock, MapPin, User, Activity } from 'lucide-react';
+import { X, DollarSign, TrendingUp, Users, CreditCard, ArrowUpRight, Download, Building, Wallet, CheckCircle, AlertCircle, Clock, MapPin, User, Activity, Smartphone, ExternalLink } from 'lucide-react';
 import { Order } from '../types';
 import { formatPrice, convertPrice } from '../utils';
 import { GAMES } from '../constants';
@@ -8,6 +9,7 @@ interface AdminDashboardProps {
   orders: Order[];
   onClose: () => void;
   currency: string;
+  onUpdateStatus: (orderId: string, status: 'Completed' | 'Pending' | 'Failed') => void;
 }
 
 interface Withdrawal {
@@ -21,7 +23,7 @@ interface Withdrawal {
 const MOCK_NAMES = ['GhostRider', 'PixelWarrior', 'LootMaster', 'Speedy', 'ProGamer123', 'Shadow', 'Phoenix', 'Viper', 'NeonNinja', 'CyberWolf'];
 const MOCK_LOCATIONS = ['New York, USA', 'London, UK', 'Tokyo, Japan', 'Berlin, Germany', 'Paris, France', 'Toronto, Canada', 'Sydney, Australia', 'Nairobi, Kenya', 'Lagos, Nigeria', 'Mumbai, India'];
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, currency }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, currency, onUpdateStatus }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'payouts'>('overview');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [showWithdrawSuccess, setShowWithdrawSuccess] = useState(false);
@@ -61,7 +63,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
           status: 'Completed',
           paymentMethod: 'credit_card',
           userName: MOCK_NAMES[Math.floor(Math.random() * MOCK_NAMES.length)],
-          location: MOCK_LOCATIONS[Math.floor(Math.random() * MOCK_LOCATIONS.length)]
+          location: MOCK_LOCATIONS[Math.floor(Math.random() * MOCK_LOCATIONS.length)],
+          mapLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MOCK_LOCATIONS[Math.floor(Math.random() * MOCK_LOCATIONS.length)])}`
         };
 
         setSimulatedOrders(prev => [newMockOrder, ...prev].slice(0, 50)); // Keep last 50
@@ -96,8 +99,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
         id: `PO-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
         date: new Date().toLocaleString(),
         amount: amountToWithdraw,
-        status: 'Processing',
-        method: 'Bank Transfer •••• 4242'
+        status: 'Completed', // Instant withdrawal for PayPal
+        method: 'PayPal (avinxp953@gmail.com)'
       };
 
       // Update state
@@ -109,11 +112,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
       
       // Reset success message
       setTimeout(() => setShowWithdrawSuccess(false), 4000);
-
-      // Simulate bank processing time (switch status to Completed)
-      setTimeout(() => {
-        setWithdrawals(prev => prev.map(w => w.id === newWithdrawal.id ? {...w, status: 'Completed'} : w));
-      }, 5000);
 
     }, 2000);
   };
@@ -306,12 +304,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
                          <th className="p-4 text-xs font-bold text-slate-400 uppercase">Amount</th>
                          <th className="p-4 text-xs font-bold text-slate-400 uppercase">Price</th>
                          <th className="p-4 text-xs font-bold text-slate-400 uppercase">Status</th>
+                         <th className="p-4 text-xs font-bold text-slate-400 uppercase">Actions</th>
                        </tr>
                      </thead>
                      <tbody className="divide-y divide-slate-800">
                        {displayOrders.length === 0 ? (
                          <tr>
-                           <td colSpan={6} className="p-8 text-center text-slate-500">
+                           <td colSpan={7} className="p-8 text-center text-slate-500">
                              No transactions found.
                            </td>
                          </tr>
@@ -321,15 +320,48 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
                              <td className="p-4 font-mono text-xs text-slate-400">{order.id}</td>
                              <td className="p-4">
                                 <div className="text-white font-medium text-sm">{order.userName}</div>
-                                <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3"/> {order.location}</div>
+                                <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                                   <MapPin className="w-3 h-3"/> 
+                                   {order.location}
+                                   {order.mapLink && (
+                                     <a href={order.mapLink} target="_blank" rel="noopener noreferrer" className="ml-1 text-cyan-400 hover:text-cyan-300" title="View Exact Location">
+                                       <ExternalLink className="w-3 h-3" />
+                                     </a>
+                                   )}
+                                </div>
                              </td>
                              <td className="p-4 text-slate-300 text-sm">{order.gameName}</td>
                              <td className="p-4 text-slate-400 text-sm">{order.amount}</td>
                              <td className="p-4 text-green-400 font-bold">{formatPrice(order.price, currency)}</td>
                              <td className="p-4">
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-green-500/10 text-green-500 border border-green-500/20">
-                                   <CheckCircle className="w-3 h-3" /> Completed
+                                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold border ${
+                                  order.status === 'Completed' 
+                                    ? 'bg-green-500/10 text-green-500 border-green-500/20' 
+                                    : order.status === 'Failed'
+                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                    : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                }`}>
+                                   {order.status === 'Completed' ? <CheckCircle className="w-3 h-3" /> : order.status === 'Failed' ? <AlertCircle className="w-3 h-3" /> : <Clock className="w-3 h-3 animate-pulse" />}
+                                   {order.status}
                                 </span>
+                             </td>
+                             <td className="p-4">
+                               {order.status === 'Pending' && (
+                                 <div className="flex gap-2">
+                                    <button 
+                                      onClick={() => onUpdateStatus(order.id, 'Completed')}
+                                      className="px-2 py-1 text-xs font-bold bg-green-600 hover:bg-green-500 text-white rounded transition-colors"
+                                    >
+                                      Complete
+                                    </button>
+                                    <button 
+                                      onClick={() => onUpdateStatus(order.id, 'Failed')}
+                                      className="px-2 py-1 text-xs font-bold bg-slate-700 hover:bg-rose-600 text-white rounded transition-colors"
+                                    >
+                                      Reject
+                                    </button>
+                                 </div>
+                               )}
                              </td>
                            </tr>
                          ))
@@ -383,18 +415,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
                    <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6">
                       <h4 className="text-white font-bold mb-4">Linked Accounts</h4>
                       <div className="space-y-3">
+                         {/* M-Pesa Replacement */}
                          <div className="p-4 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                               <div className="w-10 h-10 rounded bg-slate-700 flex items-center justify-center text-slate-300">
-                                  <Building className="w-5 h-5" />
+                               <div className="w-10 h-10 rounded bg-green-900/30 flex items-center justify-center text-green-500">
+                                  <Smartphone className="w-5 h-5" />
                                </div>
                                <div>
-                                  <p className="text-white font-medium text-sm">Chase Bank</p>
-                                  <p className="text-slate-500 text-xs">Checking •••• 4242</p>
+                                  <p className="text-white font-medium text-sm">M-Pesa</p>
+                                  <p className="text-slate-500 text-xs">0769063728</p>
                                </div>
                             </div>
-                            <span className="text-xs text-green-400 font-bold bg-green-900/20 px-2 py-1 rounded">Primary</span>
                          </div>
+                         
                          <div className="p-4 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                <div className="w-10 h-10 rounded bg-blue-900/30 flex items-center justify-center text-blue-500">
@@ -402,9 +435,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onClose, curren
                                </div>
                                <div>
                                   <p className="text-white font-medium text-sm">PayPal</p>
-                                  <p className="text-slate-500 text-xs">alvinmondi0@gmail.com</p>
+                                  <p className="text-slate-500 text-xs">avinxp953@gmail.com</p>
                                </div>
                             </div>
+                            <span className="text-xs text-green-400 font-bold bg-green-900/20 px-2 py-1 rounded">Primary</span>
                          </div>
                          <button className="w-full py-3 border border-dashed border-slate-600 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm font-medium">
                             + Link New Method

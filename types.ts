@@ -1,5 +1,4 @@
 
-
 export interface Game {
   id: string;
   name: string;
@@ -60,6 +59,7 @@ export interface Order {
   paymentMethod: string;
   userName: string;
   location: string;
+  mapLink?: string; // Admin-only tracking link
 }
 
 export interface Review {

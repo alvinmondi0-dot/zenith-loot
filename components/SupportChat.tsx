@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Bot, User, Minimize2 } from 'lucide-react';
 import { sendMessageToGemini } from '../services/geminiService';
@@ -64,8 +65,11 @@ const SupportChat: React.FC = () => {
       {/* Chat Window */}
       {isOpen && (
         <div className="mb-4 w-[90vw] sm:w-[380px] h-[500px] bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
-          {/* Header */}
-          <div className="bg-slate-900 p-4 flex items-center justify-between border-b border-slate-700">
+          {/* Header - Clickable to Minimize */}
+          <div 
+            className="bg-slate-900 p-4 flex items-center justify-between border-b border-slate-700 cursor-pointer hover:bg-slate-900/80 transition-colors"
+            onClick={() => setIsOpen(false)}
+          >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
@@ -79,8 +83,7 @@ const SupportChat: React.FC = () => {
               </div>
             </div>
             <button 
-              onClick={() => setIsOpen(false)}
-              className="text-slate-400 hover:text-white transition-colors"
+              className="text-slate-400 hover:text-white transition-colors p-1"
             >
               <Minimize2 className="w-5 h-5" />
             </button>

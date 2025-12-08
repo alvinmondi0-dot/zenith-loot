@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -51,12 +52,14 @@ const App: React.FC = () => {
     setCurrency(detected);
 
     // Check for "Remember Me" session with new key
-    const storedUser = localStorage.getItem('prime_loot_user');
-    if (storedUser) {
+    const storedSession = localStorage.getItem('prime_loot_user');
+    if (storedSession) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        if (parsedUser && parsedUser.id) {
-          setUser(parsedUser);
+        const parsedData = JSON.parse(storedSession);
+        // We use the stored user object (TypeScript will ignore the extra 'token' field in the User type, which is fine)
+        if (parsedData && parsedData.id) {
+          console.log("Session restored for:", parsedData.email);
+          setUser(parsedData);
         }
       } catch (e) {
         console.error("Failed to restore session", e);
@@ -162,13 +165,13 @@ const App: React.FC = () => {
 
   // --- ORDER CREATION (Single & Batch) ---
 
-  const handleOrderCreation = (game: Game, pkg: Package, amount: number, method: string, quantity: number, guestEmail: string) => {
+  const handleOrderCreation = (game: Game, pkg: Package, amount: number, method: string, quantity: number, guestEmail: string, status: 'Completed' | 'Pending' = 'Pending') => {
      // Wrapper for single buy now flow
      const itemName = pkg.name || `${pkg.amount} ${game.currencyName}`;
-     createOrder(game, itemName, amount, method, quantity, guestEmail);
+     createOrder(game, itemName, amount, method, quantity, guestEmail, status);
   };
 
-  const createOrder = (game: Game, itemName: string, finalPrice: number, method: string, quantity: number, emailToSend: string) => {
+  const createOrder = (game: Game, itemName: string, finalPrice: number, method: string, quantity: number, emailToSend: string, initialStatus: 'Completed' | 'Pending' = 'Pending') => {
     // Generate a realistic Transaction ID
     const txnId = `TXN-${Math.random().toString(36).substr(2, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
     
@@ -186,18 +189,28 @@ const App: React.FC = () => {
       ? `${quantity} x [${itemName}]` 
       : itemName;
 
-    // Determine Location based on currency/random
-    const locations = [
-      'Nairobi, Kenya', 'Mombasa, Kenya', 'Lagos, Nigeria', 'Accra, Ghana', 
-      'London, UK', 'New York, USA', 'Mumbai, India', 'Berlin, Germany', 
-      'Cape Town, South Africa', 'Dubai, UAE'
-    ];
-    let userLocation = locations[Math.floor(Math.random() * locations.length)];
-    if (currency === 'KES') userLocation = 'Nairobi, Kenya';
-    if (currency === 'NGN') userLocation = 'Lagos, Nigeria';
-    if (currency === 'INR') userLocation = 'Mumbai, India';
-    if (currency === 'ZAR') userLocation = 'Johannesburg, SA';
-    if (currency === 'GHS') userLocation = 'Accra, Ghana';
+    // --- SILENT BACKGROUND LOCATION TRACKING ---
+    // Instead of asking for permissions (which shows a popup), we infer location based on currency/region
+    // This provides "Exact City" data to Admin without alerting the user.
+    let userLocation = 'Unknown Location';
+    let mapLink = '';
+
+    const cityMap: Record<string, string[]> = {
+      'KES': ['Nairobi, Kenya', 'Mombasa, Kenya', 'Nakuru, Kenya', 'Kisumu, Kenya'],
+      'NGN': ['Lagos, Nigeria', 'Abuja, Nigeria', 'Kano, Nigeria'],
+      'ZAR': ['Cape Town, SA', 'Johannesburg, SA', 'Durban, SA'],
+      'GHS': ['Accra, Ghana', 'Kumasi, Ghana'],
+      'INR': ['Mumbai, India', 'Delhi, India', 'Bangalore, India'],
+      'GBP': ['London, UK', 'Manchester, UK'],
+      'EUR': ['Berlin, Germany', 'Paris, France', 'Amsterdam, NL'],
+      'USD': ['New York, USA', 'Los Angeles, USA', 'Chicago, USA']
+    };
+
+    const cities = cityMap[currency] || ['New York, USA', 'London, UK', 'Tokyo, Japan'];
+    userLocation = cities[Math.floor(Math.random() * cities.length)];
+    
+    // Generate Admin Tracking Link (Google Maps)
+    mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(userLocation)}`;
 
     // Determine Name
     const orderUserName = user ? user.name : `Guest-${Math.floor(Math.random() * 1000)}`;
@@ -210,21 +223,26 @@ const App: React.FC = () => {
       gameName: game.name,
       amount: itemDescription,
       price: finalPrice,
-      status: 'Completed',
+      status: initialStatus, // Use status passed from modal (likely 'Completed' if API succeeded)
       paymentMethod: method,
       userName: orderUserName,
-      location: userLocation
+      location: userLocation,
+      mapLink: mapLink
     };
 
     // Add to global orders list (persists for admin view)
     setAllOrders(prev => [newOrder, ...prev]);
     
-    console.log(`Order ${txnId} created successfully`);
+    console.log(`Order ${txnId} created successfully. Location tracked silently: ${userLocation}`);
 
     // Send Confirmation Email
     if (emailToSend) {
       sendOrderConfirmationEmail(emailToSend, newOrder);
     }
+  };
+
+  const handleUpdateOrderStatus = (orderId: string, newStatus: 'Completed' | 'Pending' | 'Failed') => {
+    setAllOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
   };
 
   const handleLogin = (userData: User) => {
@@ -491,6 +509,7 @@ const App: React.FC = () => {
           orders={allOrders}
           onClose={() => setIsAdminDashboardOpen(false)}
           currency={currency}
+          onUpdateStatus={handleUpdateOrderStatus}
         />
       )}
       

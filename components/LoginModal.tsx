@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, ArrowRight, Github, Check } from 'lucide-react';
+import { X, Mail, Lock, User, ArrowRight, Check } from 'lucide-react';
 import { User as UserType } from '../types';
 
 interface LoginModalProps {
@@ -20,7 +21,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
     // Check for admin credentials (Username 'Alvin' or specific email)
     const isAdmin = name.trim().toLowerCase() === 'alvin' || 
                     email.toLowerCase().includes('admin') || 
-                    email.toLowerCase() === 'alvinmondi0@gmail.com';
+                    email.toLowerCase() === 'alvinmondi0@gmail.com' ||
+                    email.toLowerCase() === 'avinxp953@gmail.com';
 
     // Simulate auth
     const user: UserType = {
@@ -31,9 +33,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
       isAdmin: isAdmin
     };
 
-    // Handle Remember Me
+    // Handle Remember Me - Store User + Session Token
     if (rememberMe) {
-      localStorage.setItem('prime_loot_user', JSON.stringify(user));
+      const sessionToken = `tk_${Math.random().toString(36).substr(2)}${Date.now()}`;
+      const sessionData = { ...user, token: sessionToken };
+      localStorage.setItem('prime_loot_user', JSON.stringify(sessionData));
     }
 
     onLogin(user);
@@ -111,7 +115,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
           {!isRegistering && (
             <div className="flex items-center justify-between pt-2">
-              <label className="flex items-center gap-2 cursor-pointer group">
+              <label className="flex items-center gap-2 cursor-pointer group select-none">
                 <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${rememberMe ? 'bg-cyan-600 border-cyan-600' : 'bg-slate-900 border-slate-600 group-hover:border-slate-500'}`}>
                   {rememberMe && <Check className="w-3 h-3 text-white" />}
                 </div>
